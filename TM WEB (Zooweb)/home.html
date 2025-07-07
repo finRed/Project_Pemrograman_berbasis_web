@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoo Passes</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: url('img/bg.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-links a.active, .nav-links a:hover {
+            background: rgba(255,255,255,0.18);
+            color: #222;
+        }
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .username {
+            color: #222;
+            font-weight: bold;
+            font-size: 1em;
+            margin-right: 8px;
+            background: none;
+            border-radius: 0;
+            padding: 0;
+        }
+        .useremail {
+            color: #222;
+            font-size: 1em;
+            margin-right: 8px;
+            background: none;
+            border-radius: 0;
+            padding: 0;
+        }
+        .logout-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover {
+            background: #cc3333;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 40px auto 0 auto;
+            padding: 0 16px;
+        }
+        .passes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+        }
+        .pass-card {
+            flex: 1 1 220px;
+            max-width: 240px;
+            min-width: 180px;
+            min-height: 440px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 32px 18px 24px 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .pass-card.green {
+            background: #b6ffb6;
+        }
+        .pass-card.blue {
+            background: #b6eaff;
+        }
+        .pass-card.yellow {
+            background: #ffe9a7;
+        }
+        .pass-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pass-icon {
+            font-size: 1.5em;
+        }
+        .pass-content {
+            width: 100%;
+            min-height: 170px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .pass-desc {
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        .pass-includes {
+            font-size: 0.97em;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        .pass-price {
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+            text-align: center;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 48px;
+            line-height: 1.3;
+        }
+        .buy-btn {
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 28px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: auto;
+            margin-bottom: 0;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+        }
+        .pass-card.green .buy-btn {
+            background: #00c853;
+        }
+        .pass-card.green .buy-btn:hover {
+            background: #43e97b;
+            color: #222;
+        }
+        .pass-card.blue .buy-btn {
+            background: #0091ea;
+        }
+        .pass-card.blue .buy-btn:hover {
+            background: #40c4ff;
+            color: #222;
+        }
+        .pass-card.yellow .buy-btn {
+            background: #ffd600;
+            color: #222;
+        }
+        .pass-card.yellow .buy-btn:hover {
+            background: #fff350;
+            color: #222;
+        }
+        .pass-card.green .pass-content,
+        .pass-card.blue .pass-content {
+            min-height: 200px;
+        }
+        @media (max-width: 1000px) {
+            .passes {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="home.html" class="active">Home</a>
+            <a href="animals.html">Animals</a>
+            <a href="event.html">Events</a>
+            <a href="History.html">History</a>
+        </div>
+        <div class="navbar-right">
+            <span class="username" id="navbar-username"></span>
+            <span class="useremail" id="navbar-email"></span>
+            <button class="logout-btn" onclick="handleLogout()">Log out</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="passes" id="passes-section">
+            <div class="pass-card green">
+                <div class="pass-title"><span class="pass-icon">🐾</span>Wild Explorer Pass</div>
+                <div class="pass-content">
+                    <div class="pass-desc">Standard entry to all main zoo exhibits and trails.</div>
+                    <div class="pass-includes">
+                        Includes:<br>
+                        • Access to all animal enclosures<br>
+                        • Daily keeper talks<br>
+                        • Entry valid for one full day
+                    </div>
+                </div>
+                <div class="pass-price">Price: IDR 30.000 Adults<br>IDR 15.000 Kids</div>
+                <button class="buy-btn" onclick="window.location.href='wild.html'">Buy Ticket</button>
+            </div>
+            <div class="pass-card blue">
+                <div class="pass-title"><span class="pass-icon">🦅</span>Adventure Trail Pass</div>
+                <div class="pass-content">
+                    <div class="pass-desc">Everything in the Wild Explorer Pass plus exciting extras.</div>
+                    <div class="pass-includes">
+                        Includes:<br>
+                        • Guided animal encounters<br>
+                        • Behind-the-scenes habitat tour<br>
+                        • Priority entry lines
+                    </div>
+                </div>
+                <div class="pass-price">Price: IDR 50.000 Adults<br>IDR 25.000 Kids</div>
+                <button class="buy-btn" onclick="window.location.href='adven.html'">Buy Ticket</button>
+            </div>
+            <div class="pass-card yellow">
+                <div class="pass-title"><span class="pass-icon">🦁</span>King of the Jungle Pass</div>
+                <div class="pass-content">
+                    <div class="pass-desc">Unlimited visits and VIP perks for 90 days.</div>
+                    <div class="pass-includes">
+                        Includes:<br>
+                        • Unlimited entry for 1 months<br>
+                        • Discounts at cafes, gift shops & events<br>
+                        • Invitations to exclusive member-only experiences<br>
+                        • 1 free guest pass per month (individual)
+                        • 1 free show pass of your choice (family)
+                    </div>
+                </div>
+                <div class="pass-price">Price: IDR 60.000 Individual<br>IDR 300.000 Family</div>
+                <button class="buy-btn" onclick="window.location.href='King.html'">Buy Ticket</button>
+            </div>
+        </div>
+        <div id="history-section" style="display:none; margin-top:40px;">
+            <h2 style="margin-bottom:20px;">Booking History</h2>
+            <div id="history-list">Loading...</div>
+        </div>
+    </div>
+    <script>
+        // Show username in navbar and check auth with Firebase
+        document.addEventListener('DOMContentLoaded', function() {
+            auth.onAuthStateChanged(function(user) {
+                if (!user) {
+                    window.location.href = 'login.html';
+                } else {
+                    db.collection('users').doc(user.uid).get().then(function(doc) {
+                        let username = '';
+                        if (doc.exists && doc.data().username) {
+                            username = doc.data().username;
+                        } else {
+                            // Fallback: use part before '@' in email
+                            username = user.email.split('@')[0];
+                        }
+                        document.getElementById('navbar-username').textContent = username;
+                        document.getElementById('navbar-email').textContent = user.email;
+                    });
+                    setupHistory(user.uid);
+                }
+            });
+
+            // History tab logic
+            document.getElementById('history-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                document.getElementById('passes-section').style.display = 'none';
+                document.getElementById('history-section').style.display = '';
+                this.classList.add('active');
+                // Remove active from other nav links
+                document.querySelectorAll('.nav-links a').forEach(a => {
+                    if (a !== this) a.classList.remove('active');
+                });
+            });
+            // Home tab logic
+            document.querySelector('a[href="home.html"]').addEventListener('click', function() {
+                document.getElementById('passes-section').style.display = '';
+                document.getElementById('history-section').style.display = 'none';
+                this.classList.add('active');
+                document.getElementById('history-link').classList.remove('active');
+            });
+        });
+
+        function addDays(dateStr, days) {
+            const d = new Date(dateStr);
+            d.setDate(d.getDate() + days);
+            return d;
+        }
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            if (isNaN(d)) return '-';
+            return d.toLocaleDateString('en-GB');
+        }
+        function parseDate(dateStr) {
+            // If dateStr is in dd/mm/yyyy
+            const [day, month, year] = dateStr.split('/');
+            return new Date(year, month - 1, day);
+        }
+        function isActive(visitDate, expireDate) {
+            const today = new Date();
+            const visit = parseDate(visitDate);
+            console.log('Today:', today, 'Visit:', visit, 'Equal:', today.getTime() === visit.getTime());
+            // Active if today >= visitDate and today <= expireDate
+            return today >= visit && today <= expireDate;
+        }
+        function setupHistory(userId) {
+            const historyList = document.getElementById('history-list');
+            db.collection('bookings').where('userId', '==', userId).orderBy('orderDate', 'desc').get()
+                .then(snapshot => {
+                    if (snapshot.empty) {
+                        historyList.innerHTML = '<p>No bookings found.</p>';
+                        return;
+                    }
+                    let html = '<table style="width:100%;border-collapse:collapse;">';
+                    html += '<tr style="background:#e0ffe0;"><th style="padding:8px;border:1px solid #ccc;">Pass Type</th><th style="padding:8px;border:1px solid #ccc;">Visit Date</th><th style="padding:8px;border:1px solid #ccc;">Order Date</th><th style="padding:8px;border:1px solid #ccc;">Expires</th><th style="padding:8px;border:1px solid #ccc;">Price</th><th style="padding:8px;border:1px solid #ccc;">Status</th></tr>';
+                    snapshot.forEach(doc => {
+                        const d = doc.data();
+                        let expireDate = null;
+                        let passType = d.passType || d.ticketType || '-';
+                        if (passType === 'Wild Explorer Pass') {
+                            expireDate = addDays(d.visitDate, 1);
+                        } else if (passType === 'Adventure Trail Pass') {
+                            expireDate = addDays(d.visitDate, 3);
+                        } else if (passType === 'King of the Jungle Pass') {
+                            expireDate = addDays(d.visitDate, 30);
+                        }
+                        let status = '-';
+                        if (expireDate) {
+                            status = isActive(d.visitDate, expireDate) ? 'Active' : 'Expired';
+                        } else {
+                            status = d.status || '-';
+                        }
+                        html += `<tr>
+                            <td style="padding:8px;border:1px solid #ccc;">${passType}</td>
+                            <td style="padding:8px;border:1px solid #ccc;">${formatDate(d.visitDate)}</td>
+                            <td style="padding:8px;border:1px solid #ccc;">${formatDate(d.orderDate)}</td>
+                            <td style="padding:8px;border:1px solid #ccc;">${expireDate ? formatDate(expireDate) : '-'}</td>
+                            <td style="padding:8px;border:1px solid #ccc;">IDR ${parseInt(d.totalPrice || 0).toLocaleString()}</td>
+                            <td style="padding:8px;border:1px solid #ccc;">${status}</td>
+                        </tr>`;
+                    });
+                    html += '</table>';
+                    historyList.innerHTML = html;
+                })
+                .catch(err => {
+                    historyList.innerHTML = '<p style="color:red;">Error loading history.</p>';
+                    console.error('Error loading booking history:', err);
+                });
+        }
+        // Logout logic
+        function handleLogout() {
+            if (confirm('Are you sure you want to log out?')) {
+                auth.signOut().then(function() {
+                    window.location.href = 'login.html';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

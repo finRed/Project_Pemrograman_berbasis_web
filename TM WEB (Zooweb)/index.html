@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildlife Signup Form</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('/img/Signbg.png');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .top-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .form-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .btn-login {
+            background-color: #4fa1d6;
+        }
+        
+        .btn-signup {
+            background-color: #4cd964;
+        }
+        
+        .btn-submit {
+            background-color: #4cd964;
+            padding: 10px 20px;
+            float: right;
+            margin-top: 20px;
+        }
+
+        .btn-submit:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+
+        .success {
+            background-color: #4cd964;
+        }
+
+        .error {
+            background-color: #ff3b30;
+        }
+
+        .username {
+            font-weight: bold;
+        }
+
+        .useremail {
+            font-weight: normal;
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <!-- Top right corner buttons -->
+    <div class="top-buttons">
+        <button onclick="window.location.href='login.html'" class="btn btn-login">Log In</button>
+        <button onclick="window.location.href='index.html'" class="btn btn-signup">Sign Up</button>
+    </div>
+    
+    <div class="form-container">
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="input-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required minlength="6">
+        </div>
+        
+        <div class="input-group">
+            <label for="confirm-password">Confirm Password</label>
+            <input type="password" id="confirm-password" name="confirm-password" required>
+        </div>
+        
+        <div style="text-align: right;">
+            <button id="submitBtn" onclick="handleSignUp()" class="btn btn-submit">Submit</button>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div class="navbar-right">
+        <span class="username" id="navbar-username"></span>
+        <span class="useremail" id="navbar-email"></span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // If just signed up, skip the redirect once
+            if (sessionStorage.getItem('justSignedUp')) {
+                sessionStorage.removeItem('justSignedUp');
+                return;
+            }
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    window.location.href = 'home.html';
+                }
+            });
+        });
+
+        // Show message function
+        function showMessage(message, isError = false) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${isError ? 'error' : 'success'}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Handle sign up with Firebase
+        function handleSignUp() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (!username || !email || !password || !confirmPassword) {
+                showMessage('Please fill in all fields', true);
+                return;
+            }
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', true);
+                return;
+            }
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters long', true);
+                return;
+            }
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating Account...';
+            document.body.classList.add('loading');
+            // Firebase Auth
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Save username to Firestore
+                    return db.collection('users').doc(userCredential.user.uid).set({
+                        username: username,
+                        email: email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    return auth.signOut();
+                })
+                .then(() => {
+                    // Set a flag so the redirect logic doesn't fire
+                    sessionStorage.setItem('justSignedUp', '1');
+                    showMessage('Account created successfully! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 1200);
+                })
+                .catch((error) => {
+                    showMessage(error.message, true);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit';
+                    document.body.classList.remove('loading');
+                });
+        }
+
+        // Allow form submission on Enter key
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSignUp();
+            }
+        });
+    </script>
+</body>
+</html>

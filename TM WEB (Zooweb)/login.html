@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildlife Login</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('/img/bg.png');
+            background-color: #ffffff;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .top-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .btn-login {
+            background-color: #4cd964;
+        }
+        
+        .btn-signup {
+            background-color: #7acfd6;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group label {
+            display: inline-block;
+            width: 100px;
+            color: black;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-group input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .bottom-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-confirm {
+            background-color: #4cd964;
+        }
+
+        .btn-confirm:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+
+        .success {
+            background-color: #4cd964;
+        }
+
+        .error {
+            background-color: #ff3b30;
+        }
+    </style>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <!-- Top right corner buttons -->
+    <div class="top-buttons">
+        <button onclick="window.location.href='login.html'" class="btn btn-login">Log In</button>
+        <button onclick="window.location.href='index.html'" class="btn btn-signup">Sign Up</button>
+    </div>
+    
+    <div class="login-container">
+        <div class="form-group">
+            <label for="email">E-mail</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        
+        <div class="bottom-buttons">
+            <button id="confirmBtn" onclick="handleLogin()" class="btn btn-confirm">Confirm</button>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <script>
+        // Redirect to home if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    window.location.href = 'home.html';
+                }
+            });
+        });
+
+        // Show message function
+        function showMessage(message, isError = false) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${isError ? 'error' : 'success'}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Handle login with Firebase
+        function handleLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmBtn = document.getElementById('confirmBtn');
+            if (!email || !password) {
+                showMessage('Please fill in all fields', true);
+                return;
+            }
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Signing In...';
+            document.body.classList.add('loading');
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    showMessage('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1200);
+                })
+                .catch((error) => {
+                    showMessage(error.message, true);
+                })
+                .finally(() => {
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Confirm';
+                    document.body.classList.remove('loading');
+                });
+        }
+
+        // Add event listeners for better user experience
+        document.addEventListener('DOMContentLoaded', function() {
+            // Allow login on Enter key press
+            document.getElementById('password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            document.getElementById('email').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

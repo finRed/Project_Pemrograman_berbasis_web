@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Tigress</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(0, 100, 150, 0.3) 0%, 
+                rgba(0, 150, 100, 0.3) 50%, 
+                rgba(100, 200, 150, 0.3) 100%);
+            z-index: 1;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+
+        .back-icon {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+
+        .content {
+            position: relative;
+            z-index: 5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .text-content {
+            flex: 1;
+            padding-right: 40px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            line-height: 1.2;
+            font-style: italic;
+        }
+
+        .fun-fact {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .fun-fact h3 {
+            color: #FFD700;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .fun-fact p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .tiger-image-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin-left: 40px;
+        }
+
+        .tiger-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .tiger-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .description {
+            font-size: 1.3em;
+            line-height: 1.7;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .text-content {
+                padding-right: 0;
+                margin-bottom: 30px;
+            }
+
+            .tiger-image-container {
+                width: 300px;
+                height: 300px;
+                margin-left: 0;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+
+            .description {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Video Background -->
+        <video class="video-background" autoplay muted loop>
+            <source src="videos/tiger.mp4" type="video/mp4">
+            <!-- Fallback for browsers that don't support video -->
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Overlay -->
+        <div class="overlay"></div>
+
+        <!-- Back Button -->
+        <button class="back-button" onclick="goBack()">
+            <svg class="back-icon" viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/>
+            </svg>
+        </button>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="text-content">
+                <p class="title">Meet Tigress, a powerful and graceful tiger whose sleek orange coat is marked with bold black stripes each pattern as unique as a fingerprint. With sharp amber eyes and silent, purposeful movements, Tigress embodies both strength and stealth, ruling her forest domain with calm confidence.</p>
+
+                <div class="fun-fact">
+                    <h3>Fun Fact:</h3>
+                    <p>No two tigers share the same stripe pattern—not only do their coats differ, but their skin is striped too!</p>
+                </div>
+            </div>
+
+            <div class="tiger-image-container">
+                <div class="tiger-circle">
+                    <img src="https://images.unsplash.com/photo-1561731216-c3a4d99437d5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Tigress" class="tiger-image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      function goBack() {
+    window.location.href = 'animals.html';
+}
+        // Optional: Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.querySelector('.back-button');
+            const tigerImage = document.querySelector('.tiger-image');
+
+            // Add hover effect to tiger image
+            tigerImage.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+
+            tigerImage.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+
+            // Add click effect to back button
+            backButton.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.1)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

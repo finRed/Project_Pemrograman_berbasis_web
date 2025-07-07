@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Gura</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(20, 60, 120, 0.5) 0%, 
+                rgba(40, 80, 140, 0.5) 50%, 
+                rgba(60, 100, 160, 0.5) 100%);
+            z-index: 1;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+
+        .back-icon {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+
+        .content {
+            position: relative;
+            z-index: 5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .text-content {
+            flex: 1;
+            padding-right: 40px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            line-height: 1.2;
+            font-style: italic;
+        }
+
+        .fun-facts {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .fun-facts h3 {
+            color: #FFD700;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .fun-facts ul {
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        .fun-facts li {
+            margin-bottom: 15px;
+        }
+
+        .closing-note {
+            font-size: 1.2em;
+            font-style: italic;
+            color: #87CEEB;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .shark-image-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin-left: 40px;
+        }
+
+        .shark-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .shark-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .description {
+            font-size: 1.3em;
+            line-height: 1.7;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .text-content {
+                padding-right: 0;
+                margin-bottom: 30px;
+            }
+
+            .shark-image-container {
+                width: 300px;
+                height: 300px;
+                margin-left: 0;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+
+            .description {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Video Background -->
+        <video class="video-background" autoplay muted loop>
+            <source src="videos/shark.mp4" type="video/mp4">
+            <!-- Fallback for browsers that don't support video -->
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Overlay -->
+        <div class="overlay"></div>
+
+        <!-- Back Button -->
+        <button class="back-button" onclick="goBack()">
+            <svg class="back-icon" viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/>
+            </svg>
+        </button>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="text-content">
+                <h1 class="title">Introducing Gura the Blue Shark</h1>
+
+                <p class="description">Meet Gura, the sleek and graceful blue shark! Known for their deep blue color and streamlined body, blue sharks are one of the most elegant predators of the ocean.</p>
+
+                <div class="fun-facts">
+                    <h3>Fun Facts about Blue Sharks:</h3>
+                    <ul>
+                        <li>Blue sharks can travel vast distances—up to thousands of miles across oceans.</li>
+                        <li>Their diet consists mainly of fish and squid, but they're also opportunistic and will try eating sea birds.</li>
+                        <li>Despite their intimidating appearance, blue sharks are relatively shy and often avoid humans.</li>
+                    </ul>
+                    <p class="closing-note">I hope these fun facts about Gura help!</p>
+                </div>
+            </div>
+
+            <div class="shark-image-container">
+                <div class="shark-circle">
+                    <img src="/img/shark2.webp" alt="Gura the Blue Shark" class="shark-image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            // You can customize this function based on your needs
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback if there's no history
+                window.location.href = '/';
+            }
+        }
+
+        // Optional: Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.querySelector('.back-button');
+            const sharkImage = document.querySelector('.shark-image');
+
+            // Add hover effect to shark image
+            sharkImage.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+
+            sharkImage.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+
+            // Add click effect to back button
+            backButton.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.1)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

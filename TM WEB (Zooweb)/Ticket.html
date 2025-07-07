@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Ticket QR Code</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: url('img/bg.png') no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #333;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .back-btn {
+      background: #e9ecef;
+      color: #333;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .back-btn:hover { background: #dee2e6; }
+
+    .ticket-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .ticket-header {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .ticket-title {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .ticket-subtitle {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .ticket-content {
+      padding: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .ticket-info {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 10px;
+      border-left: 5px solid #4ade80;
+    }
+
+    .info-group {
+      margin-bottom: 20px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      color: #333;
+      font-size: 16px;
+      padding: 8px 0;
+    }
+
+    .qr-section {
+      text-align: center;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .qr-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #qrcode-container {
+      margin: 20px auto;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      line-height: 0; /* Fix for extra space under canvas */
+    }
+
+    .ticket-footer {
+      background: #f8f9fa;
+      padding: 20px;
+      text-align: center;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .footer-text {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .download-btn {
+      background: #4ade80;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .download-btn:hover { background: #22c55e; }
+    .download-btn:disabled { 
+      background: #ccc; 
+      cursor: not-allowed; 
+    }
+
+    @media (max-width: 768px) {
+      .ticket-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+      .ticket-title {
+        font-size: 24px;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .header {
+        display: none;
+      }
+      .ticket-container {
+        box-shadow: none;
+        border-radius: 0;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🔥 E-Ticket QR Code</h1>
+    <button class="back-btn" id="backHomeBtn" type="button">← Back Home</button>
+  </div>
+
+  <div class="ticket-container">
+    <div class="ticket-header">
+      <div class="ticket-title">Booking Confirmation</div>
+      <div class="ticket-subtitle">QR Code with Real Booking Data</div>
+    </div>
+
+    <div class="ticket-content">
+      <div class="ticket-info">
+        <div class="info-group">
+          <div class="info-label">Booking ID</div>
+          <div class="info-value" id="bookingId">Loading...</div>
+        </div>
+        
+        <div class="info-group">
+          <div class="info-label">Pass Type</div>
+          <div class="info-value" id="passType">Loading...</div>
+        </div>
+        
+        <div class="info-group">
+          <div class="info-label">Customer Name</div>
+          <div class="info-value" id="customerName">Loading...</div>
+        </div>
+        
+        <div class="info-group">
+          <div class="info-label">Visit Date</div>
+          <div class="info-value" id="visitDate">Loading...</div>
+        </div>
+        
+        <div class="info-group">
+          <div class="info-label">Tickets</div>
+          <div class="info-value" id="tickets">Loading...</div>
+        </div>
+        
+        <div class="info-group">
+          <div class="info-label">Total Price</div>
+          <div class="info-value" id="totalPrice">Loading...</div>
+        </div>
+        
+        <div class="info-group">
+          <div class="info-label">Order Date</div>
+          <div class="info-value" id="orderDateDisplay">Loading...</div>
+        </div>
+      </div>
+
+      <div class="qr-section">
+        <div class="qr-title">🎫 Scan E-Ticket</div>
+        <div id="qrcode-container">
+          <canvas id="qrcode-canvas"></canvas>
+        </div>
+        <p id="qr-status" style="color: #666; font-size: 14px; margin-top: 15px;">
+          Generating QR code...
+        </p>
+        <button id="downloadBtn" class="download-btn" onclick="downloadQRCode()" disabled>
+          📥 Download QR Code
+        </button>
+      </div>
+    </div>
+
+    <div class="ticket-footer">
+      <div class="footer-text">
+        <strong>QR Code Function:</strong> This QR code is the Ticket for the Zoo
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // FIX 2: Added Firebase configuration and initialization.
+    // IMPORTANT: Replace this with your actual Firebase project configuration!
+    const firebaseConfig = {
+  apiKey: "AIzaSyCpM2oIMfyhdqTuG4nEAxK1jRi1ASogjW4",
+  authDomain: "zooweb-cfb04.firebaseapp.com",
+  projectId: "zooweb-cfb04",
+  storageBucket: "zooweb-cfb04.firebasestorage.app",
+  messagingSenderId: "555414228975",
+  appId: "1:555414228975:web:2d230a6b33d4853da7701a",
+  measurementId: "G-WM2PNVVWKP"
+};
+
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Get booking ID from URL parameters
+    function getBookingId() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('bookingId');
+    }
+
+    // Populate ticket information on the page
+    function populateTicketInfo(bookingData) {
+      document.getElementById('bookingId').textContent = bookingData.bookingId || 'N/A';
+      document.getElementById('passType').textContent = bookingData.passType || 'N/A';
+      document.getElementById('customerName').textContent = bookingData.customerName || 'N/A';
+      document.getElementById('visitDate').textContent = formatDate(bookingData.visitDate) || 'N/A';
+      document.getElementById('tickets').textContent = `${bookingData.adultTickets || 0} Adult, ${bookingData.kidsTickets || 0} Kids`;
+      document.getElementById('totalPrice').textContent = `IDR ${parseInt(bookingData.totalPrice || 0).toLocaleString()}`;
+      document.getElementById('orderDateDisplay').textContent = formatDate(bookingData.orderDate) || 'N/A';
+    }
+
+    // Format date for display
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      // Handle Firebase Timestamps or date strings
+      const date = dateString.toDate ? dateString.toDate() : new Date(dateString);
+      if (isNaN(date)) return 'Invalid Date';
+      
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    // Generate QR code with URL to ticket.html
+    async function generateFirebaseQR(bookingData) {
+      const qrStatus = document.getElementById('qr-status');
+      const downloadBtn = document.getElementById('downloadBtn');
+      try {
+        // Create URL to ticket.html with booking ID
+        const ticketUrl = `${window.location.origin}/ticket.html?bookingId=${bookingData.bookingId}`;
+        console.log('Generating QR Code with URL:', ticketUrl);
+        
+        // Generate QR code with the ticket URL
+        const canvas = document.getElementById('qrcode-canvas');
+        await QRCode.toCanvas(canvas, ticketUrl, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        });
+
+        console.log('QR code generated successfully!');
+        qrStatus.textContent = 'Scan QR code to use the e-ticket';
+        qrStatus.style.color = '#333';
+        
+        // Enable download button after QR code is generated
+        downloadBtn.disabled = false;
+
+      } catch (err) {
+        console.error('Error generating QR code:', err);
+        qrStatus.innerHTML = '<p style="color: red;">Error generating QR code</p>';
+      }
+    }
+
+    // Download QR code as image
+    function downloadQRCode() {
+      try {
+        const canvas = document.getElementById('qrcode-canvas');
+        const bookingId = getBookingId();
+        
+        // Create a temporary link element
+        const link = document.createElement('a');
+        link.download = `zoo-ticket-${bookingId || 'qr'}.png`;
+        
+        // Convert canvas to blob and create download URL
+        canvas.toBlob(function(blob) {
+          const url = URL.createObjectURL(blob);
+          link.href = url;
+          
+          // Trigger download
+          document.body.appendChild(link);
+          link.click();
+          
+          // Clean up
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          console.log('QR code downloaded successfully!');
+        }, 'image/png');
+        
+      } catch (error) {
+        console.error('Error downloading QR code:', error);
+        alert('Error downloading QR code. Please try again.');
+      }
+    }
+    
+    // Main function to initialize the page
+    async function initializePage() {
+      const bookingId = getBookingId();
+      const qrStatus = document.getElementById('qr-status');
+      
+      if (!bookingId) {
+        alert('No booking ID found. Please go back and try again.');
+        window.location.href = 'home.html'; // Or your booking page
+        return;
+      }
+      
+      try {
+        // Fetch booking data from Firestore
+        const bookingDoc = await db.collection('bookings').doc(bookingId).get();
+        
+        if (bookingDoc.exists) {
+          const bookingData = { bookingId: bookingDoc.id, ...bookingDoc.data() };
+          console.log('Firebase booking data:', bookingData);
+          
+          // Populate ALL info from the fetched data
+          populateTicketInfo(bookingData);
+          
+          // Generate QR code with the fetched data
+          await generateFirebaseQR(bookingData);
+          
+        } else {
+          console.error('Booking document not found in Firebase');
+          document.body.innerHTML = `<h2 style="text-align:center; padding: 40px; color: red;">Booking with ID ${bookingId} not found.</h2>`;
+        }
+      } catch (error) {
+        console.error('Error fetching Firebase data:', error);
+        qrStatus.innerHTML = '<p style="color: red;">Error connecting to the database.</p>';
+      }
+    }
+
+    // Save booking to History and go home
+    async function saveToHistoryAndGoHome() {
+      const bookingId = getBookingId();
+      if (!bookingId) {
+        window.location.href = 'home.html';
+        return;
+      }
+      try {
+        const bookingDoc = await db.collection('bookings').doc(bookingId).get();
+        if (bookingDoc.exists) {
+          const data = { ...bookingDoc.data(), bookingId };
+          await db.collection('History').add(data);
+          alert('Ticket saved to History!');
+        } else {
+          alert('Booking not found, nothing saved.');
+        }
+      } catch (e) {
+        alert('Failed to save to History. See console for details.');
+        console.error('Failed to save to History:', e);
+      }
+      localStorage.setItem('lastBookingId', bookingId);
+      window.location.href = `home.html?bookingId=${bookingId}`;
+    }
+
+    // Load page when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('backHomeBtn');
+      if (btn) {
+        btn.addEventListener('click', function(event) {
+          event.preventDefault();
+          console.log('Back Home button clicked');
+          saveToHistoryAndGoHome();
+        });
+      }
+    });
+
+    // Initialize page
+    initializePage();
+
+    if (bookingId) {
+      const currentDate = new Date().toISOString().split('T')[0];
+      db.collection('bookings').doc(bookingId).update({
+        orderDate: currentDate
+      }).then(() => {
+        console.log('Order date updated!');
+        // Optionally, remove the bookingId from storage or URL
+        // localStorage.removeItem('lastBookingId');
+        // Or update the URL to remove the param
+      }).catch((error) => {
+        console.error('Error updating order date:', error);
+      });
+    }
+
+    const visitDateInput = document.getElementById('visitDate');
+    const orderDateInput = document.getElementById('orderDate');
+    if (visitDateInput && orderDateInput) {
+      visitDateInput.addEventListener('change', function() {
+        orderDateInput.value = this.value;
+      });
+    }
+  </script>
+</body>
+</html>

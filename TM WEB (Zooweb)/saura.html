@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meet Saura</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(60, 120, 60, 0.5) 0%, 
+                rgba(80, 140, 70, 0.5) 50%, 
+                rgba(100, 160, 80, 0.5) 100%);
+            z-index: 1;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: scale(1.1);
+        }
+
+        .back-icon {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+
+        .content {
+            position: relative;
+            z-index: 5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .text-content {
+            flex: 1;
+            padding-right: 40px;
+        }
+
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+            line-height: 1.2;
+            font-style: italic;
+        }
+
+        .fun-facts {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .fun-facts h3 {
+            color: #90EE90;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .fun-facts ul {
+            font-size: 1.1em;
+            line-height: 1.6;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+            padding-left: 20px;
+            list-style-type: disc;
+        }
+
+        .fun-facts li {
+            margin-bottom: 15px;
+        }
+
+        .closing-note {
+            font-size: 1.2em;
+            font-style: italic;
+            color: #98FB98;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .saura-image-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin-left: 40px;
+        }
+
+        .saura-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .saura-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .description {
+            font-size: 1.3em;
+            line-height: 1.7;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .text-content {
+                padding-right: 0;
+                margin-bottom: 30px;
+            }
+
+            .saura-image-container {
+                width: 300px;
+                height: 300px;
+                margin-left: 0;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+
+            .description {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Video Background -->
+        <video class="video-background" autoplay muted loop>
+            <source src="videos/saura.mp4" type="video/mp4">
+            <!-- Fallback for browsers that don't support video -->
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Overlay -->
+        <div class="overlay"></div>
+
+        <!-- Back Button -->
+        <button class="back-button" onclick="goBack()">
+            <svg class="back-icon" viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/>
+            </svg>
+        </button>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="text-content">
+                <h1 class="title">Meet Saura the Iguana</h1>
+
+                <p class="description">Saura is a bright green iguana with sun-kissed scales, a laid-back vibe, and a tail longer than most lizards' life stories. She's a vegetarian queen, chillin' in the treetops of the Mangrove Maze, munching on mango leaves and soaking up rays like it's a full-time job. She's got a spiky back ridge that makes her look a little punk, and eyes that say, "I've seen things... but I'm not stressed about it." While Rex is power and Steve is cunning, Saura is all zen—calm, observant, and surprisingly wise.</p>
+
+                <div class="fun-facts">
+                    <h3>Fun Facts about Iguanas (And Saura):</h3>
+                    <ul>
+                        <li>Green iguanas like Saura have a "third eye" on top of their heads—it's called a parietal eye. It doesn't see images, but it detects light and movement, helping them spot predators like birds from above.</li>
+                        <li>Iguanas are excellent swimmers and can hold their breath underwater for up to 30 minutes when escaping predators.</li>
+                    </ul>
+                    <p class="closing-note">Saura embodies the peaceful wisdom of her species!</p>
+                </div>
+            </div>
+
+            <div class="saura-image-container">
+                <div class="saura-circle">
+                    <img src="img/iguana2.jpg" alt="Saura the Green Iguana" class="saura-image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            // You can customize this function based on your needs
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                // Fallback if there's no history
+                window.location.href = '/';
+            }
+        }
+
+        // Optional: Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const backButton = document.querySelector('.back-button');
+            const sauraImage = document.querySelector('.saura-image');
+
+            // Add hover effect to saura image
+            sauraImage.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+
+            sauraImage.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+
+            // Add click effect to back button
+            backButton.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1.1)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
